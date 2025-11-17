@@ -11,7 +11,7 @@
 
   <block>
     <space ne='1' imo='0' fmo='0' />
-    <space ne='1' imo='5' fmo='5' />
+    <space ne='1' imo='1' fmo='5' />
   </block>
 
 </input>

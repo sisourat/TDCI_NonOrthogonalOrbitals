@@ -3,12 +3,12 @@
 debug = True
 ne = 2
 
-tbasis = {'He': 'ccpvdz'}
+tbasis = {'He': 'sto-3g'}
 tgeom = "He 0 0 0;"
 tcharge = 0
 tspin = 0
 
-pbasis = {'H': 'ccpvdz'}
+pbasis = {'H': 'aug-ccpvdz'}
 elp = "H"
 xp = 0
 yp = 0

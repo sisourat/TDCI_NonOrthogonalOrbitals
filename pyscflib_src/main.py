@@ -42,7 +42,12 @@ if __name__ == "__main__":
 
 # Collision dynamics
   blist = np.linspace(bmin,bmax,nbb)
-  zlist =  np.sort(np.concatenate((-np.logspace(-18, 0, base=2, num=ngrid)*zmax,np.logspace(-18, 0, base=2, num=ngrid)*zmax)))
+  if(gridtype=='exp'):
+    zlist =  np.sort(np.concatenate((-np.logspace(-18, 0, base=2, num=ngrid)*zmax,np.logspace(-18, 0, base=2, num=ngrid)*zmax)))
+  elif(gridtype=='lin'):
+    zlist =  np.linspace(-zmax,zmax,ngrid)
+  else:
+    raise NotImplementedError('Exp or Lin Grid only')
 
   nmo = ntmo + npmo
 
