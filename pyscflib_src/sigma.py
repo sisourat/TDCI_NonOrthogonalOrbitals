@@ -21,8 +21,11 @@ for i in range(nsta):
  print(i,sig[i])
 
 print()
+print(sig[9]+sig[14])
+#print(sig[2]+sig[4])
 #print(np.sum(sig[1:5]))
-print(np.sum(sig[9:18]))
+#print(np.sum(sig[9:18]))
+#sys.exit()
 
 print()
 print("IEM Model")
@@ -33,6 +36,7 @@ for i in range(nsta):
  print(i,sig[i])
 
 print()
+#print(sig[1]+sig[2])
 #print(np.sum(sig[1:5]))
-print(np.sum(sig[9:18]))
+#print(np.sum(sig[9:18]))
 

@@ -1,7 +1,7 @@
 import sys
 import numpy as np
 
-from pyscf import gto, scf, ao2mo
+from pyscf import gto, scf, ao2mo, lo
 
 def hcore(mol,mo):
    """ Computes the one-electron terms for given mol and mo """
@@ -28,9 +28,11 @@ def system(mol,debug=False):
   '''
     Computes target or projectile HF orbitals
   '''
-
   conv, e, mo_e, mo, mo_occ = scf.hf.kernel(scf.hf.SCF(mol), dm0=np.eye(mol.nao_nr()))
   nmo = len(mo_e)
+
+  mf = scf.RHF(mol).run()
+  lomo = lo.orth_ao(mf, 'nao')
 
   print()
   print(e)

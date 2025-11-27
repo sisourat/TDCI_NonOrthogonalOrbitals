@@ -2,20 +2,20 @@
   
   <general>
    <spin> 1 </spin>
-   <electron na='2' nb='2' />
+   <electron na='1' nb='1' />
   </general>
 
   <block>
-    <space ne='4' imo='0' fmo='1' />
+    <space ne='2' imo='0' fmo='0' />
   </block>
 
   <block>
-    <space ne='3' imo='0' fmo='1' />
+    <space ne='1' imo='0' fmo='1' />
     <space ne='1' imo='2' fmo='5' />
   </block>
 
   <block>
-    <space ne='3' imo='0' fmo='1' />
+    <space ne='1' imo='0' fmo='1' />
     <space ne='1' imo='10' fmo='14' />
   </block>
 
