@@ -2,15 +2,17 @@
 
 debug = True
 analyze = True
+nstep_analysis = 10
+
 ne = 4
 
-tbasis = {'He': 'ccpvdz', 'ghost': [[0, [38.36, 0.023809], [5.77, 0.154891], [1.24, 0.469987]], [0, [0.2976, 1.0]], [1, [1.275, 1.0]]]
+tbasis = {'He': 'sto-3g', 'ghost': [[0, [38.36, 0.023809], [5.77, 0.154891], [1.24, 0.469987]], [0, [0.2976, 1.0]], [1, [1.275, 1.0]]]
 }
-tgeom = "He 0 0 -3.0 ; He  0 0 3.0; "
+tgeom = "He 0 0 -12.0 ; He  0 0 12.0; "
 tcharge = 0
 tspin = 0
 
-pbasis = {'H': 'augccpvdz'}
+pbasis = {'H': 'sto-3g'}
 elp = "H"
 xp = 0
 yp = 0

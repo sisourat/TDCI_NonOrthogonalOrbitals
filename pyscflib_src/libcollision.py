@@ -31,8 +31,8 @@ def system(mol,debug=False):
   conv, e, mo_e, mo, mo_occ = scf.hf.kernel(scf.hf.SCF(mol), dm0=np.eye(mol.nao_nr()))
   nmo = len(mo_e)
 
- # mf = scf.RHF(mol).run()
- # lomo = lo.orth_ao(mf, 'nao')
+  #mf = scf.RHF(mol).run()
+  #lomo = lo.orth_ao(mf, 'nao')
 
   print()
   print(e)

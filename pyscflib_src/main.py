@@ -3,13 +3,15 @@ import numpy as np
 import sys
 import os
 import pathlib
+import matplotlib.pyplot as plt
 
 from libcollision import *
 from libdyn import *
-#from inputcoll import *
+from libanalysis import *
 from generate_csfs import *
 from cimat import *
 from scipy.interpolate import interp1d
+
 
 if __name__ == "__main__":
 
@@ -31,12 +33,16 @@ if __name__ == "__main__":
 # Computes target and projectile HF orbitals and ""model"" orbitals
   print("TARGET")
   tmo, tmo_e = system(tmol,debug)
+  #tmo = [[1.0,0.0],[0.0,1.0]]
+  #print(tmo)
   ntmo = len(tmo)
 
   print()
 
   print("PROJECTILE")
   pmo, pmo_e = system(pmol,debug)
+  #pmo = [1.0]
+  #print(pmo)
   npmo = len(pmo)
 
   if(sys.argv[1]=='0'):
@@ -98,7 +104,6 @@ if __name__ == "__main__":
 
   for b in blist:
    tmat = []
-   ovl_mo = []
    for zproj in zlist:
      time = zproj/vproj
      phase = []
@@ -119,7 +124,6 @@ if __name__ == "__main__":
      mol.build( unit = 'Bohr')
 
      ovl, kin, pot = hcore(mol,smo)
-     ovl_mo.append(ovl)
      h1e = kin + pot
      eri = twoeints(mol,smo)
 
@@ -144,9 +148,40 @@ if __name__ == "__main__":
     fout = open('prob_time_'+str(vproj)+'_'+str(b)+'.txt','w')
     for it, time in enumerate(t_grid):
        zproj = vproj * time
-       if(it%10==0):
+       if(it%nstep_analysis==0):
         amp2 = np.abs(wf_t[it])**2
         print(zproj,' '.join(map(str,amp2)),np.sum(amp2),file=fout)
     fout.close()
     # can do 1rdm analysis here
+
+    ztime = []
+    stime = []
+    for it, time in enumerate(t_grid):
+       zproj = vproj * time
+       if(it%nstep_analysis==0):
+
+        ztime.append(zproj)
+        xp = b
+        yp = 0
+        zp = zproj
+        pgeom = elp + " " + str(xp) + " " + str(yp) + " " + str(zp)
+        sgeom = tgeom + pgeom
+        mol = gto.M(atom=sgeom,basis=sbasis,charge=scharge,spin=sspin)
+        mol.build( unit = 'Bohr')
+
+        ovl, kin, pot = hcore(mol,smo)
+        cicoeffs = wf_t[it]
+        rdm1 =  np.real(one_rdm_nonorth(csfs, cicoeffs, ovl))
+        eigenvalues, eigenvectors = np.linalg.eigh(rdm1)
+        # Compute von Neumann entropy
+        entropy = -np.sum(eigenvalues * np.log(eigenvalues + 1e-12))  # Add small value to avoid log(0)
+        #print(zproj,entropy)
+        stime.append(entropy)
+        print(zproj,rdm1[0,0],rdm1[1,1],rdm1[3,3],rdm1[4,4],rdm1[2,2],rdm1[5,5])
+        #print(np.real(rdm1))
+        #print(np.trace(np.real(rdm1)))
+        #print()
+
+    plt.plot(ztime, stime)
+    plt.show()
 
