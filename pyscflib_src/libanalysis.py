@@ -86,18 +86,13 @@ def one_rdm_nonorth(csfs, cicoeffs, ovlmo):
                      #print(i1,i2)
                      #print(det1,det2)
                      tdm = compute_tdm(det1, det2, ovl)
-                     tdm2 = compute_2tdm(det1, det2, det1, det2, ovl)
+                     #tdm2 = compute_2tdm(det1, det2, det1, det2, ovl)
 
                      # Accumulate contributions to the RDM
                      gamma += c2 * np.conj(c1) * tdm
-                     gamma2 += c2 * np.conj(c1) * tdm2
-    #print(gamma2)
-    print("Diagonal elements of the 2-RDM (pair populations):")
-    for p in range(gamma2.shape[0]):
-      for q in range(gamma2.shape[1]):
-        print(f"Γ({p},{q},{p},{q}) = {gamma2[p, q, p, q]:.3f}")
+                     #gamma2 += c2 * np.conj(c1) * tdm2
 
-    return gamma
+    return gamma#, gamma2
 
 def compute_tdm(det_i, det_j, S):
     """

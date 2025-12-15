@@ -12,6 +12,7 @@ def cimat(ne,nmo,ovmo,h1emo,r12mo,csfs,phase):
  ncsfs = len(csfs)
  hmat = np.zeros((ncsfs,ncsfs), dtype=complex)
  smat = np.zeros((ncsfs,ncsfs), dtype=complex)
+
  imat1 = 0
  for i1, csf1 in enumerate(csfs):
     nterm1 = csf1.nterms

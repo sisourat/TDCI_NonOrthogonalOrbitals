@@ -1,6 +1,7 @@
 import numpy as np
-from numba import njit, int64
+from numba import njit, int64, prange
 from numba.experimental import jitclass
+from numba import optional
 
 # -------------------- 1. Jitclass --------------------
 spec = [
@@ -15,8 +16,8 @@ class Sdeterminant:
     def __init__(self, nalpha, nbeta, alpha, beta):
         self.nalpha = nalpha
         self.nbeta = nbeta
-        self.alpha = alpha
-        self.beta = beta
+        self.alpha = np.asarray(alpha, dtype=np.int64)
+        self.beta = np.asarray(beta, dtype=np.int64)
 
 # -------------------- 2. Determinant --------------------
 @njit
@@ -47,7 +48,7 @@ def copy_excluding(mat, out, row_indices, col_indices):
         ri += 1
 
 # -------------------- 4. Lowdin function --------------------
-@njit
+@njit(fastmath=True)
 def lowdin(ne, nmo, ovmo, h1emo, r12mo, det1, det2):
     ovmat = np.zeros((ne, ne), dtype=np.complex128)
     ovstore = np.zeros_like(ovmat)
@@ -94,12 +95,15 @@ def lowdin(ne, nmo, ovmo, h1emo, r12mo, det1, det2):
 
     # Two-electron term
     r12 = 0.0 + 0.0j
+   # return ov, h1e, r12
     if ne < 2:
         return ov, h1e, r12
 
     comat2 = np.zeros((ne - 2, ne - 2), dtype=np.complex128)
 
     # Alpha-alpha 2e
+    # Precompute the antisymmetrized integrals
+    r12mo_antisym = r12mo - r12mo.transpose(0, 2, 1, 3)
     for i in range(det1.nalpha):
         ia = det1.alpha[i]
         for j in range(det2.nalpha):
@@ -112,8 +116,9 @@ def lowdin(ne, nmo, ovmo, h1emo, r12mo, det1, det2):
                     copy_excluding(ovmat, comat2,
                                     np.array([j, l], dtype=np.int64),
                                     np.array([i, k], dtype=np.int64))
-                    r12 += (r12mo[la, ka, ja, ia] - r12mo[la, ja, ka, ia]) * \
-                           ((-1) ** (i + j + k + l)) * compute_det(comat2)
+                    #r12 += (r12mo[la, ka, ja, ia] - r12mo[la, ja, ka, ia]) * \
+                    #       ((-1) ** (i + j + k + l)) * compute_det(comat2)
+                    r12 += r12mo_antisym[la, ka, ja, ia] * ((-1) ** (i + j + k + l)) * compute_det(comat2)
 
     # Alpha-beta 2e
     for i in range(det1.nalpha):
@@ -132,6 +137,7 @@ def lowdin(ne, nmo, ovmo, h1emo, r12mo, det1, det2):
                            ((-1) ** (i + j + k + l + det1.nalpha + det2.nalpha)) * compute_det(comat2)
 
     # Beta-beta 2e
+    r12mo_antisym = r12mo - r12mo.transpose(0, 2, 1, 3)
     for i in range(det1.nbeta):
         ib = det1.beta[i]
         for j in range(det2.nbeta):
@@ -144,8 +150,9 @@ def lowdin(ne, nmo, ovmo, h1emo, r12mo, det1, det2):
                     copy_excluding(ovmat, comat2,
                                     np.array([j + det2.nalpha, l + det2.nalpha], dtype=np.int64),
                                     np.array([i + det1.nalpha, k + det1.nalpha], dtype=np.int64))
-                    r12 += (r12mo[lb, kb, jb, ib] - r12mo[lb, jb, kb, ib]) * \
-                           ((-1) ** (i + j + k + l + 2*det1.nalpha + 2*det2.nalpha)) * compute_det(comat2)
+                    #r12 += (r12mo[lb, kb, jb, ib] - r12mo[lb, jb, kb, ib]) * \
+                    #       ((-1) ** (i + j + k + l + 2*det1.nalpha + 2*det2.nalpha)) * compute_det(comat2)
+                    r12 += r12mo_antisym[lb, kb, jb, ib] * ((-1) ** (i + j + k + l + 2*det1.nalpha + 2*det2.nalpha)) * compute_det(comat2)
 
     return ov, h1e, r12
 
