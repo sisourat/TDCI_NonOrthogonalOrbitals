@@ -11,7 +11,12 @@
 
   <block>
     <space ne='3' imo='0' fmo='1' />
-    <space ne='1' imo='2' fmo='2' />
+    <space ne='1' imo='2' fmo='5' />
+  </block>
+
+  <block>
+    <space ne='3' imo='0' fmo='1' />
+    <space ne='1' imo='10' fmo='14' />
   </block>
 
 </input>

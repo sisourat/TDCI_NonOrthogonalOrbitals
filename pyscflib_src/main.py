@@ -20,16 +20,14 @@ if __name__ == "__main__":
   from inputcoll import *
   sgeom = tgeom + pgeom
   sbasis = tbasis | pbasis
-  secp = tecp | pecp
-  print(tecp,secp)
   scharge = tcharge + pcharge
   sspin = tspin + pspin
 
-  tmol = gto.M(atom=tgeom,basis=tbasis,charge=tcharge,spin=tspin,ecp=tecp)
+  tmol = gto.M(atom=tgeom,basis=tbasis,charge=tcharge,spin=tspin)
   tmol.build( unit = 'Bohr')
-  pmol = gto.M(atom=pgeom,basis=pbasis,charge=pcharge,spin=pspin,ecp=pecp)
+  pmol = gto.M(atom=pgeom,basis=pbasis,charge=pcharge,spin=pspin)
   pmol.build( unit = 'Bohr')
-  mol = gto.M(atom=sgeom,basis=sbasis,charge=scharge,spin=sspin,ecp=secp)
+  mol = gto.M(atom=sgeom,basis=sbasis,charge=scharge,spin=sspin)
   mol.build( unit = 'Bohr')
 
 # Computes target and projectile HF orbitals and ""model"" orbitals
@@ -67,11 +65,17 @@ if __name__ == "__main__":
   zp = -zmax
   pgeom = elp + " " + str(xp) + " " + str(yp) + " " + str(zp)
   sgeom = tgeom + pgeom
-  mol = gto.M(atom=sgeom,basis=sbasis,charge=scharge,spin=sspin,ecp=secp)
+  mol = gto.M(atom=sgeom,basis=sbasis,charge=scharge,spin=sspin)
   mol.build( unit = 'Bohr')
 
   csfs = process_xml_csf(xmlfile)
   ncsfs = len(csfs)
+
+  for i in range(ncsfs):
+      print(i,csfs[i])
+
+  if(sys.argv[1]=='0'):
+      sys.exit()
 
   # Asymptotic Energies
   phase = np.ones(ncsfs)
@@ -82,6 +86,11 @@ if __name__ == "__main__":
 
   hmat, smat = cimat(ne,nmo,ovl,h1e,eri,csfs,phase)
   eig, eigv = np.linalg.eig(hmat)
+  idx = eig.argsort()[::-1]
+  eig = eig[idx]
+  eigv = eigv[:,idx]
+  nsta = len(eig)
+
 
   esta = []
   net = []
@@ -89,19 +98,30 @@ if __name__ == "__main__":
   print()
   print("Asymptotic energies")
   print()
-  for i, csf in enumerate(csfs):
-    _, alpe, betae =  csf.terms[0]
+
+  # Get the absolute values of the eigenvectors
+  abs_eigv = np.abs(eigv)
+  # Find the index of the largest component for each eigenvector (column)
+  largest_component_indices = np.argmax(abs_eigv, axis=0)
+  # Find the values of the largest components
+  largest_component_values = abs_eigv[largest_component_indices, range(eigv.shape[1])]
+
+
+  for i in range(nsta):
+    _, alpe, betae =  csfs[largest_component_indices[i]].terms[0]
     nte = int(np.count_nonzero(np.array(alpe)<ntmo) + np.count_nonzero(np.array(betae)<ntmo))
     npe = len(alpe)+len(betae)-nte
     net.append(nte)
     nep.append(npe)
     #esta.append(hmat[i,i].real)
     esta.append(eig[i])
-    print(i, esta[i], hmat[i,i].real, "          ", alpe, betae, nte, npe)
+    print(i, esta[i].real)#, "          ", alpe, betae, nte, npe, largest_component_indices[i],largest_component_values[i])
+    print(*[ (j, eigv[j,i].real) for j in range(ncsfs)])
+    print()
     #print(i, esta[i], "          ", csf)
 
-  if(sys.argv[1]=='0'):
-      sys.exit()
+  i_init = int(input('Enter the initial state : '))
+
 
   for b in blist:
 
@@ -127,7 +147,7 @@ if __name__ == "__main__":
      zp = zproj
      pgeom = elp + " " + str(xp) + " " + str(yp) + " " + str(zp)
      sgeom = tgeom + pgeom
-     mol = gto.M(atom=sgeom,basis=sbasis,charge=scharge,spin=sspin,ecp=secp)
+     mol = gto.M(atom=sgeom,basis=sbasis,charge=scharge,spin=sspin)
      mol.build( unit = 'Bohr')
 
      ovl, kin, pot = hcore(mol,smo)
@@ -147,12 +167,14 @@ if __name__ == "__main__":
    tlist = zlist/vproj
    hmat_interp = interp1d(tlist, tmat , axis=0)
    psi0 = np.zeros(ncsfs, dtype=complex)
-   psi0[i_init-1] = 1.0
+   psi0[i_init] = 1.0
    ntime = int(2.0*zmax/(vproj*dtime))
    t_grid = np.linspace(zlist[0]/vproj,zlist[-1]/vproj,ntime)
    wf_t = solve_tdse(hmat_interp, psi0, t_grid)
    prob = np.abs(wf_t[-1,:])**2
-   print(b,*prob,np.sum(prob))
+   formatted_string = "  ".join([f"{num:.6f}" for num in prob])
+   print(b, formatted_string,' ', f"{np.sum(prob):.6f}")
+   #print(b,*prob,np.sum(prob))
 
    #analyzing the dynamics for bproj = b
    if analyze == True:
@@ -177,7 +199,7 @@ if __name__ == "__main__":
         zp = zproj
         pgeom = elp + " " + str(xp) + " " + str(yp) + " " + str(zp)
         sgeom = tgeom + pgeom
-        mol = gto.M(atom=sgeom,basis=sbasis,charge=scharge,spin=sspin,ecp=secp)
+        mol = gto.M(atom=sgeom,basis=sbasis,charge=scharge,spin=sspin)
         mol.build( unit = 'Bohr')
 
         ovl, kin, pot = hcore(mol,smo)

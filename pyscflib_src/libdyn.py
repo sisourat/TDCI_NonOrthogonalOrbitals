@@ -16,7 +16,7 @@ def solve_tdse(hmat_interp, psi0, t_grid):
     (t_grid[0], t_grid[-1]),
     psi0,
     t_eval=t_grid,
-    method='RK45',
+    method='DOP853',
     rtol=1e-6,
     atol=1e-8,
     vectorized=False  # Ensure the function is not treated as vectorized
