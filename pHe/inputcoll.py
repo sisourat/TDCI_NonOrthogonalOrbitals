@@ -1,10 +1,14 @@
  # input
 
 debug = True
-ne = 2
+analyze = False
+nstep_analysis = 10
 
-tbasis = {'He': 'sto-3g'}
-tgeom = "He 0 0 0;"
+ne = 2
+tdoc_frozen = 0
+
+tbasis = {'He': 'aug-ccpvdz'}
+tgeom = "He 0 0 0.0 ; "
 tcharge = 0
 tspin = 0
 
@@ -17,13 +21,16 @@ pgeom = elp + " " + str(xp) + " " + str(yp) + " " + str(zp)
 pcharge = +1
 pspin = 0
 
-i_init = 1
+#i_init = 1
+dtime = 0.05
 
-zmax = -100.0
+zmax = 100.0
 ngrid = 100
-vproj = 0.4
+gridtype = 'exp'  #lin or exp
+vproj = 2.0
 bmin =  0.5
-bmax =  8.5
-nbb = 16
+bmax =  6.5
+nbb = 18
 xmlfile = 'phe.xml'
+
 

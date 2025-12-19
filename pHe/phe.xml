@@ -14,5 +14,10 @@
     <space ne='1' imo='1' fmo='5' />
   </block>
 
+  <block>
+    <space ne='1' imo='0' fmo='0' />
+    <space ne='1' imo='9' fmo='17' />
+  </block>
+
 </input>
 

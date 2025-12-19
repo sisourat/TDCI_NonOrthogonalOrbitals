@@ -170,7 +170,8 @@ if __name__ == "__main__":
    psi0[i_init] = 1.0
    ntime = int(2.0*zmax/(vproj*dtime))
    t_grid = np.linspace(zlist[0]/vproj,zlist[-1]/vproj,ntime)
-   wf_t = solve_tdse(hmat_interp, psi0, t_grid)
+   #wf_t = solve_tdse(hmat_interp, psi0, t_grid)
+   wf_t = solve_tdse_sequential(hmat_interp, psi0, t_grid)
    prob = np.abs(wf_t[-1,:])**2
    formatted_string = "  ".join([f"{num:.6f}" for num in prob])
    print(b, formatted_string,' ', f"{np.sum(prob):.6f}")
